@@ -71,7 +71,7 @@ docker build --platform linux/amd64 -t tabqa-local .
 docker run --rm \
   --mount type=bind,src=<sample-data-absolute-path>/xlsx_files,dst=/input/xlsx_files,readonly \
   --mount type=bind,src=<sample-data-absolute-path>/queries.json,dst=/input/queries.json,readonly \
-  --mount type=bind,src=<output-absolute-path>,dst=/output \
+  --mount type=bind,src=<repo-absolute-path>/output/team001,dst=/output \
   tabqa-local \
   --xlsx-dir /input/xlsx_files \
   --queries /input/queries.json \
@@ -81,7 +81,7 @@ docker run --rm \
   --openrouter-base-url https://openrouter.ai/api/v1
 ```
 
-Đường dẫn máy chủ phải là đường dẫn tuyệt đối. Nên thử cả đường dẫn có khoảng trắng.
+Đường dẫn máy chủ phải là đường dẫn tuyệt đối. Sau khi chạy xong, kết quả nằm tại `output/team001/submission.csv`. Nên thử cả đường dẫn có khoảng trắng.
 
 ## 6. Giới hạn tài nguyên
 

@@ -10,7 +10,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--xlsx-dir", type=Path, required=True)
     parser.add_argument("--queries", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--output", type=Path, default=Path("output/team001/submission.csv"))
     parser.add_argument("--openrouter-key", required=True)
     parser.add_argument("--openrouter-model", required=True)
     parser.add_argument("--openrouter-base-url", required=True)
