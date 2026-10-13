@@ -2,35 +2,27 @@
 
 ## 1. Cấu trúc tệp nộp
 
-Bài nộp là một thư mục hoặc tệp ZIP không quá 100 MB. `Dockerfile` và `run.sh` phải nằm ngay ở thư mục gốc:
+Bài nộp sử dụng Python và được đóng gói thành một thư mục hoặc tệp ZIP không quá 100 MB. `Dockerfile` và `main.py` phải nằm ngay ở thư mục gốc:
 
 ```text
 team001.zip
 |-- Dockerfile
 |-- README.md
-|-- run.sh
+|-- main.py
 `-- ...
 ```
 
 Ảnh Docker phải chạy trên Linux `amd64`, không dùng GPU và chứa sẵn toàn bộ mã nguồn cùng thư viện cần thiết. Không đưa khóa API vào bài nộp.
 
-## 2. Entrypoint bắt buộc
+## 2. Lệnh khởi động bắt buộc
 
 Ảnh Docker phải khai báo đúng:
 
 ```dockerfile
-ENTRYPOINT ["./run.sh"]
+ENTRYPOINT ["python", "main.py"]
 ```
 
-Sau khi dựng ảnh Docker, tệp `run.sh` phải có dòng đầu tiên là `#!/bin/sh`, có quyền thực thi và chuyển toàn bộ tham số nhận được sang chương trình chính bằng `"$@"`.
-
-Ví dụ nội dung `run.sh` cho bài làm bằng Python:
-
-```sh
-#!/bin/sh
-set -eu
-exec python main.py "$@"
-```
+Khi container khởi động, Docker chạy trực tiếp `main.py`. Tệp này phải nhận các tham số dòng lệnh do hệ thống chấm cung cấp và chỉ thoát với mã `0` sau khi đã ghi xong kết quả.
 
 Chương trình không được yêu cầu nhập liệu tương tác hoặc phụ thuộc vào thư mục làm việc hiện tại. Chỉ thoát với mã `0` sau khi đã ghi xong kết quả; khi lỗi phải thoát với mã khác `0`.
 

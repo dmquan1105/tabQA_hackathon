@@ -27,7 +27,7 @@ class StagingTests(unittest.TestCase):
             source = root / "Team Alpha"
             source.mkdir()
             (source / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
-            (source / "run.sh").write_text("#!/bin/sh", encoding="utf-8")
+            (source / "main.py").write_text("", encoding="utf-8")
             found = discover_submissions(root)
             self.assertEqual(found[0].submission_id, "team-alpha")
             source_hash, context_hash = stage_submission(found[0], root / "stage", Limits())
@@ -39,5 +39,5 @@ class StagingTests(unittest.TestCase):
             source = root / "team"
             source.mkdir()
             (source / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
-            with self.assertRaisesRegex(SubmissionError, "run.sh"):
+            with self.assertRaisesRegex(SubmissionError, "main.py"):
                 stage_submission(Submission("team", source, False), root / "stage", Limits())

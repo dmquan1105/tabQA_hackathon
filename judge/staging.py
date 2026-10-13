@@ -86,7 +86,7 @@ def stage_submission(submission: Submission, target: Path, limits: Limits) -> tu
     else:
         _copy_directory(submission.source, target, limits)
         submission_hash = hash_tree(submission.source)
-    for required in ("Dockerfile", "run.sh"):
+    for required in ("Dockerfile", "main.py"):
         if not (target / required).is_file():
             raise SubmissionError(f"{required} must exist at the submission root")
     return submission_hash, hash_tree(target)

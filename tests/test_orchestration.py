@@ -44,7 +44,7 @@ class OrchestrationTests(unittest.TestCase):
             source = root / "team"
             source.mkdir()
             (source / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
-            (source / "run.sh").write_text("#!/bin/sh", encoding="utf-8")
+            (source / "main.py").write_text("", encoding="utf-8")
             xlsx = root / "xlsx_files"
             xlsx.mkdir()
             queries = root / "queries.json"
@@ -78,7 +78,7 @@ class OrchestrationTests(unittest.TestCase):
             source = root / "team"
             source.mkdir()
             (source / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
-            (source / "run.sh").write_text("#!/bin/sh", encoding="utf-8")
+            (source / "main.py").write_text("", encoding="utf-8")
             xlsx = root / "xlsx_files"
             xlsx.mkdir()
             queries = root / "queries.json"
