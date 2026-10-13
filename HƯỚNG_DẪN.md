@@ -5,7 +5,7 @@
 Bài nộp là một thư mục hoặc tệp ZIP không quá 100 MB. `Dockerfile` và `run.sh` phải nằm ngay ở thư mục gốc:
 
 ```text
-submission.zip
+team001.zip
 |-- Dockerfile
 |-- README.md
 |-- run.sh
@@ -19,22 +19,24 @@ submission.zip
 Ảnh Docker phải khai báo đúng:
 
 ```dockerfile
-ENTRYPOINT ["/solution/run.sh"]
+ENTRYPOINT ["./run.sh"]
 ```
 
-`run.sh` phải nằm tại `/solution/run.sh`, có shebang POSIX `/bin/sh`, có quyền thực thi và chuyển nguyên vẹn các tham số bằng `"$@"`. Ví dụ:
+Sau khi dựng ảnh Docker, tệp `run.sh` phải có dòng đầu tiên là `#!/bin/sh`, có quyền thực thi và chuyển toàn bộ tham số nhận được sang chương trình chính bằng `"$@"`.
+
+Ví dụ nội dung `run.sh` cho bài làm bằng Python:
 
 ```sh
 #!/bin/sh
 set -eu
-exec python /solution/main.py "$@"
+exec python main.py "$@"
 ```
 
 Chương trình không được yêu cầu nhập liệu tương tác hoặc phụ thuộc vào thư mục làm việc hiện tại. Chỉ thoát với mã `0` sau khi đã ghi xong kết quả; khi lỗi phải thoát với mã khác `0`.
 
 ## 3. Các tham số đầu vào
 
-Hệ thống gọi `/solution/run.sh` với đủ sáu tham số bắt buộc:
+Hệ thống gọi entrypoint của ảnh Docker với đủ sáu tham số bắt buộc:
 
 ```text
 --xlsx-dir /input/xlsx_files
@@ -92,7 +94,7 @@ docker run --rm \
 ## 7. Danh sách kiểm tra trước khi nộp
 
 - `Dockerfile` và `run.sh` nằm ở gốc thư mục hoặc tệp ZIP.
-- `ENTRYPOINT` là chính xác `["/solution/run.sh"]`.
+- `ENTRYPOINT` là chính xác `["./run.sh"]`.
 - `run.sh` dùng `/bin/sh`, có quyền thực thi và chuyển tham số bằng `"$@"`.
 - Ảnh dựng được cho `linux/amd64` và không cần GPU.
 - Chương trình nhận đủ sáu tham số, xử lý được đường dẫn có khoảng trắng và không sửa `/input`.

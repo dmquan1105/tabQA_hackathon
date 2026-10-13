@@ -106,13 +106,13 @@ class DockerRunner:
             image_size = int(image.get("Size", 0))
         except (OSError, subprocess.SubprocessError, RuntimeError, ValueError, KeyError) as exc:
             return BuildOutcome(Status.JUDGE_ERROR, seconds, error=str(exc))
-        if entrypoint != ["/solution/run.sh"]:
+        if entrypoint != ["./run.sh"]:
             return BuildOutcome(
                 Status.IMAGE_ERROR,
                 seconds,
                 image_id,
                 image_size,
-                'image entrypoint must be exactly ["/solution/run.sh"]',
+                'image entrypoint must be exactly ["./run.sh"]',
             )
         if image_size > self.limits.image_bytes:
             return BuildOutcome(

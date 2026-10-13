@@ -1,3 +1,3 @@
 #!/bin/sh
 set -eu
-exec python /solution/main.py "$@"
+exec python main.py "$@"

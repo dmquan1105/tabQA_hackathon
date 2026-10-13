@@ -1,7 +1,7 @@
 FROM python:3.12.8-slim
 
-WORKDIR /solution
-COPY . /solution
-RUN sed -i 's/\r$//' /solution/run.sh && chmod +x /solution/run.sh
+WORKDIR /app
+COPY . .
+RUN sed -i 's/\r$//' run.sh && chmod +x run.sh
 
-ENTRYPOINT ["/solution/run.sh"]
+ENTRYPOINT ["./run.sh"]
