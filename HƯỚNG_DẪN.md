@@ -2,29 +2,39 @@
 
 ## 1. Cấu trúc tệp nộp
 
-Bài nộp sử dụng Python và được đóng gói thành một thư mục hoặc tệp ZIP không quá 100 MB. `Dockerfile` và `main.py` phải nằm ngay ở thư mục gốc:
+Bài nộp là một thư mục hoặc tệp ZIP không quá 100 MB. Chỉ `Dockerfile` bắt buộc phải nằm ngay ở thư mục gốc; tên và cấu trúc các tệp còn lại do đội tự chọn:
 
 ```text
 team001.zip
 |-- Dockerfile
-|-- README.md
-|-- main.py
-`-- ...
+`-- ...mã nguồn và tệp cần thiết...
 ```
 
 Ảnh Docker phải chạy trên Linux `amd64`, không dùng GPU và chứa sẵn toàn bộ mã nguồn cùng thư viện cần thiết. Không đưa khóa API vào bài nộp.
 
-## 2. Lệnh khởi động bắt buộc
+## 2. Entrypoint
 
-Ảnh Docker phải khai báo đúng:
+Ảnh Docker phải khai báo `ENTRYPOINT` để nhận các tham số dòng lệnh từ hệ thống chấm. Không bắt buộc ngôn ngữ hoặc tên tệp cụ thể.
+
+Python:
 
 ```dockerfile
 ENTRYPOINT ["python", "main.py"]
 ```
 
-Khi container khởi động, Docker chạy trực tiếp `main.py`. Tệp này phải nhận các tham số dòng lệnh do hệ thống chấm cung cấp và chỉ thoát với mã `0` sau khi đã ghi xong kết quả.
+JavaScript:
 
-Chương trình không được yêu cầu nhập liệu tương tác hoặc phụ thuộc vào thư mục làm việc hiện tại. Chỉ thoát với mã `0` sau khi đã ghi xong kết quả; khi lỗi phải thoát với mã khác `0`.
+```dockerfile
+ENTRYPOINT ["node", "main.js"]
+```
+
+Rust:
+
+```dockerfile
+ENTRYPOINT ["./app"]
+```
+
+Chương trình được khai báo trong `ENTRYPOINT` phải nhận các tham số do hệ thống chấm cung cấp. Chương trình không được yêu cầu nhập liệu tương tác và chỉ thoát với mã `0` sau khi đã ghi xong kết quả; khi lỗi phải thoát với mã khác `0`.
 
 ## 3. Các tham số đầu vào
 

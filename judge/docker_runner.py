@@ -27,6 +27,14 @@ class RunOutcome:
     error: str | None = None
 
 
+def valid_entrypoint(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and bool(value)
+        and all(isinstance(part, str) and bool(part) for part in value)
+    )
+
+
 class DockerRunner:
     def __init__(self, limits: Limits, platform: str = "linux/amd64") -> None:
         self.limits = limits
@@ -106,13 +114,13 @@ class DockerRunner:
             image_size = int(image.get("Size", 0))
         except (OSError, subprocess.SubprocessError, RuntimeError, ValueError, KeyError) as exc:
             return BuildOutcome(Status.JUDGE_ERROR, seconds, error=str(exc))
-        if entrypoint != ["python", "main.py"]:
+        if not valid_entrypoint(entrypoint):
             return BuildOutcome(
                 Status.IMAGE_ERROR,
                 seconds,
                 image_id,
                 image_size,
-                'image entrypoint must be exactly ["python", "main.py"]',
+                "image must define a non-empty ENTRYPOINT",
             )
         if image_size > self.limits.image_bytes:
             return BuildOutcome(
