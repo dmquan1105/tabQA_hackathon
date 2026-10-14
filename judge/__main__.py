@@ -10,10 +10,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import load_execution, load_judge_runtime, load_limits, load_runtime_file, resolve_runtime_config
+from .config import load_execution, load_judge_runtime, load_limits, load_paths, load_runtime_file, resolve_runtime_config
 from .discovery import discover_submissions, submission_from_path
 from .docker_runner import DockerRunner
 from .models import Limits, RunResult, RuntimeConfig, Status, Submission
+from .progress import ProgressReporter
 from .reporting import write_leaderboard, write_result
 from .scorer import load_answers, score_answers
 from .staging import SubmissionError, stage_submission
@@ -108,8 +109,12 @@ def judge_submission(
     runner: DockerRunner,
     build_semaphore: threading.Semaphore,
     usage_path: Path | None = None,
+    answers_dir: Path | None = None,
+    progress: ProgressReporter | None = None,
 ) -> RunResult:
     result = RunResult(submission.submission_id, run_id, total=len(query_ids), queued_at=iso(queued_at))
+    if progress is not None:
+        progress.update(submission.submission_id, "STAGING")
     started_at = utc_now()
     result.started_at = iso(started_at)
     result.queue_seconds = (started_at - queued_at).total_seconds()
@@ -128,7 +133,11 @@ def judge_submission(
                 return result
 
             image_tag = f"tabqa-{submission.submission_id}:{result.context_sha256[:12]}"
+            if progress is not None:
+                progress.update(submission.submission_id, "WAITING_FOR_BUILD")
             with build_semaphore:
+                if progress is not None:
+                    progress.update(submission.submission_id, "BUILDING")
                 build = runner.build(
                     context,
                     image_tag,
@@ -144,6 +153,8 @@ def judge_submission(
                 return result
 
             container_name = f"tabqa-{submission.submission_id}-{run_id}".lower()
+            if progress is not None:
+                progress.update(submission.submission_id, "RUNNING")
             outcome = runner.run(
                 image_tag,
                 container_name,
@@ -172,15 +183,25 @@ def judge_submission(
                 result.error = outcome.error
                 return result
 
+            if progress is not None:
+                progress.update(submission.submission_id, "VALIDATING")
             try:
                 submitted = validate_submission(output_dir / "submission.csv", query_ids, limits.output_bytes)
             except InvalidOutput as exc:
                 result.status = Status.INVALID_OUTPUT
                 result.error = str(exc)
                 return result
-            shutil.copy2(output_dir / "submission.csv", run_dir / "submission.csv")
+            if progress is not None:
+                progress.update(submission.submission_id, "SCORING")
             result.correct, result.per_question = score_answers(expected, submitted)
             result.average_seconds_per_question = result.run_seconds / result.total if result.total else 0.0
+            if progress is not None:
+                progress.update(submission.submission_id, "SAVING_RESULTS")
+            shutil.copy2(output_dir / "submission.csv", run_dir / "submission.csv")
+            if answers_dir is not None:
+                team_answers = answers_dir / submission.submission_id
+                team_answers.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(output_dir / "submission.csv", team_answers / "submission.csv")
             result.status = Status.ACCEPTED
             return result
     except Exception as exc:
@@ -191,13 +212,19 @@ def judge_submission(
         result.finished_at = iso(utc_now())
         shutil.rmtree(output_dir, ignore_errors=True)
         write_result(run_dir / "result.json", result)
+        if progress is not None:
+            progress.finish(submission.submission_id, result.status)
 
 
 def add_runtime_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--openrouter-key")
     parser.add_argument("--openrouter-model")
     parser.add_argument("--openrouter-base-url")
-    parser.add_argument("--runtime-config", type=Path)
+    parser.add_argument(
+        "--runtime-config",
+        type=Path,
+        default=Path("organizer-config/run-config.local.toml"),
+    )
     parser.add_argument("--judge-config", type=Path, default=Path("organizer-config/judge.toml"))
     parser.add_argument("--answers", type=Path)
     parser.add_argument(
@@ -211,11 +238,24 @@ def effective_config_path(path: Path) -> Path | None:
     return path if path.is_file() else None
 
 
+def configured_path(cli_value: Path | None, paths: dict[str, Path], name: str) -> Path:
+    value = cli_value or paths.get(name)
+    if value is None:
+        option = "answers-dir" if name == "answers" else name
+        raise ValueError(f"missing required path {name!r}; set --{option} or [paths].{name}")
+    return value
+
+
 def execute_one(args: argparse.Namespace) -> int:
     submission = submission_from_path(args.solution)
     config_path = effective_config_path(args.judge_config)
     limits = load_limits(config_path)
+    execution = load_execution(config_path)
     judge_runtime = load_judge_runtime(config_path)
+    paths = load_paths(config_path)
+    dataset = configured_path(args.dataset, paths, "dataset")
+    results = configured_path(args.results, paths, "results")
+    answers_dir = configured_path(args.answers_dir, paths, "answers")
     runtime_file = load_runtime_file(args.runtime_config)
     runtime = resolve_runtime_config(
         submission.submission_id,
@@ -224,28 +264,35 @@ def execute_one(args: argparse.Namespace) -> int:
         args.openrouter_model or judge_runtime.get("model"),
         args.openrouter_base_url or judge_runtime.get("openrouter_base_url"),
     )
-    answers_path = args.answers or args.dataset / "answers.csv"
-    xlsx_dir, queries_path, query_ids, expected = validate_dataset(args.dataset, answers_path)
+    answers_path = args.answers or dataset / "answers.csv"
+    xlsx_dir, queries_path, query_ids, expected = validate_dataset(dataset, answers_path)
     run_id = make_run_id()
-    run_dir = args.results / submission.submission_id / run_id
+    run_dir = results / submission.submission_id / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
     runner = DockerRunner(limits, str(judge_runtime.get("platform", "linux/amd64")))
     try:
-        result = judge_submission(
-            submission,
-            run_id,
-            run_dir,
-            utc_now(),
-            xlsx_dir,
-            queries_path,
-            query_ids,
-            expected,
-            runtime,
+        with ProgressReporter(
+            [submission.submission_id],
             limits,
-            runner,
-            threading.Semaphore(1),
-            args.usage_dir / submission.submission_id / f"{run_id}.json" if args.usage_dir else None,
-        )
+            float(execution.get("progress_interval_seconds", 5)),
+        ) as progress:
+            result = judge_submission(
+                submission,
+                run_id,
+                run_dir,
+                utc_now(),
+                xlsx_dir,
+                queries_path,
+                query_ids,
+                expected,
+                runtime,
+                limits,
+                runner,
+                threading.Semaphore(1),
+                args.usage_dir / submission.submission_id / f"{run_id}.json" if args.usage_dir else None,
+                answers_dir,
+                progress,
+            )
     finally:
         runner.cleanup()
     print(json.dumps(result.to_dict(public=True), ensure_ascii=False, indent=2))
@@ -253,11 +300,16 @@ def execute_one(args: argparse.Namespace) -> int:
 
 
 def execute_all(args: argparse.Namespace) -> int:
-    submissions = discover_submissions(args.solutions)
     config_path = effective_config_path(args.judge_config)
     limits = load_limits(config_path)
     execution = load_execution(config_path)
     judge_runtime = load_judge_runtime(config_path)
+    paths = load_paths(config_path)
+    solutions = configured_path(args.solutions, paths, "solutions")
+    dataset = configured_path(args.dataset, paths, "dataset")
+    answers_dir = configured_path(args.answers_dir, paths, "answers")
+    results_dir = configured_path(args.results, paths, "results")
+    submissions = discover_submissions(solutions, str(execution.get("solution_glob", "*")))
     max_concurrent = args.max_concurrent or int(execution.get("max_concurrent", 1))
     max_builds = args.max_concurrent_builds or int(execution.get("max_concurrent_builds", 1))
     if max_concurrent < 1 or max_builds < 1:
@@ -274,13 +326,13 @@ def execute_all(args: argparse.Namespace) -> int:
         )
         for item in submissions
     }
-    answers_path = args.answers or args.dataset / "answers.csv"
-    xlsx_dir, queries_path, query_ids, expected = validate_dataset(args.dataset, answers_path)
-    args.results.mkdir(parents=True, exist_ok=True)
+    answers_path = args.answers or dataset / "answers.csv"
+    xlsx_dir, queries_path, query_ids, expected = validate_dataset(dataset, answers_path)
+    results_dir.mkdir(parents=True, exist_ok=True)
     jobs = []
     for submission in submissions:
         run_id = make_run_id()
-        run_dir = args.results / submission.submission_id / run_id
+        run_dir = results_dir / submission.submission_id / run_id
         run_dir.mkdir(parents=True, exist_ok=False)
         jobs.append((submission, run_id, run_dir, utc_now()))
 
@@ -288,33 +340,38 @@ def execute_all(args: argparse.Namespace) -> int:
     build_semaphore = threading.Semaphore(max_builds)
     results: list[RunResult] = []
     try:
-        with ThreadPoolExecutor(max_workers=max_concurrent) as pool:
-            futures = [
-                pool.submit(
-                    judge_submission,
-                    submission,
-                    run_id,
-                    run_dir,
-                    queued_at,
-                    xlsx_dir,
-                    queries_path,
-                    query_ids,
-                    expected,
-                    runtimes[submission.submission_id],
-                    limits,
-                    runner,
-                    build_semaphore,
-                    args.usage_dir / submission.submission_id / f"{run_id}.json" if args.usage_dir else None,
-                )
-                for submission, run_id, run_dir, queued_at in jobs
-            ]
-            for future in as_completed(futures):
-                result = future.result()
-                results.append(result)
-                print(f"{result.submission_id}: {result.status.value}")
+        with ProgressReporter(
+            [submission.submission_id for submission, _, _, _ in jobs],
+            limits,
+            float(execution.get("progress_interval_seconds", 5)),
+        ) as progress:
+            with ThreadPoolExecutor(max_workers=max_concurrent) as pool:
+                futures = [
+                    pool.submit(
+                        judge_submission,
+                        submission,
+                        run_id,
+                        run_dir,
+                        queued_at,
+                        xlsx_dir,
+                        queries_path,
+                        query_ids,
+                        expected,
+                        runtimes[submission.submission_id],
+                        limits,
+                        runner,
+                        build_semaphore,
+                        args.usage_dir / submission.submission_id / f"{run_id}.json" if args.usage_dir else None,
+                        answers_dir,
+                        progress,
+                    )
+                    for submission, run_id, run_dir, queued_at in jobs
+                ]
+                for future in as_completed(futures):
+                    results.append(future.result())
     finally:
         runner.cleanup()
-    write_leaderboard(args.results, results)
+    write_leaderboard(results_dir, results)
     return 0 if all(item.status == Status.ACCEPTED for item in results) else 1
 
 
@@ -331,15 +388,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     run_one = commands.add_parser("run-one", help="judge one directory or ZIP submission")
     run_one.add_argument("--solution", type=Path, required=True)
-    run_one.add_argument("--dataset", type=Path, required=True)
-    run_one.add_argument("--results", type=Path, required=True)
+    run_one.add_argument("--dataset", type=Path)
+    run_one.add_argument("--answers-dir", type=Path)
+    run_one.add_argument("--results", type=Path)
     add_runtime_arguments(run_one)
     run_one.set_defaults(handler=execute_one)
 
     run_all = commands.add_parser("run-all", help="judge every submission in a directory")
-    run_all.add_argument("--solutions", type=Path, required=True)
-    run_all.add_argument("--dataset", type=Path, required=True)
-    run_all.add_argument("--results", type=Path, required=True)
+    run_all.add_argument("--solutions", type=Path)
+    run_all.add_argument("--dataset", type=Path)
+    run_all.add_argument("--answers-dir", type=Path)
+    run_all.add_argument("--results", type=Path)
     run_all.add_argument("--max-concurrent", type=int)
     run_all.add_argument("--max-concurrent-builds", type=int)
     add_runtime_arguments(run_all)

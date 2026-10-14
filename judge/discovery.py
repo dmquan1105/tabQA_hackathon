@@ -26,18 +26,17 @@ def submission_from_path(path: Path) -> Submission:
     return Submission(sanitize_submission_id(source_name), path, is_archive)
 
 
-def discover_submissions(directory: Path) -> list[Submission]:
+def discover_submissions(directory: Path, pattern: str = "*") -> list[Submission]:
     if not directory.is_dir():
         raise ValueError(f"solutions directory does not exist: {directory}")
     submissions: list[Submission] = []
-    unsupported: list[str] = []
     for child in directory.iterdir():
-        if child.is_dir() or (child.is_file() and child.suffix.lower() == ".zip"):
+        if not child.match(pattern):
+            continue
+        if child.is_dir() and (child / "Dockerfile").is_file():
             submissions.append(submission_from_path(child))
-        else:
-            unsupported.append(child.name)
-    if unsupported:
-        raise ValueError(f"unsupported entries in solutions directory: {', '.join(sorted(unsupported))}")
+        elif child.is_file() and child.suffix.lower() == ".zip":
+            submissions.append(submission_from_path(child))
     submissions.sort(key=lambda item: item.submission_id)
     ids = [item.submission_id for item in submissions]
     duplicates = sorted({item for item in ids if ids.count(item) > 1})

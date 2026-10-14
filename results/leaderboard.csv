@@ -1,0 +1,2 @@
+rank,submission_id,status,correct,total,average_seconds_per_question,average_tokens_per_question,llm_cost_usd,run_id
+1,team001,ACCEPTED,15,20,5.113250000000699,,,20261014T062302Z-08332e4c

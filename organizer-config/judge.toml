@@ -6,7 +6,7 @@ image_bytes = 4294967296
 build_seconds = 1200
 run_seconds = 2400
 memory_bytes = 1073741824
-cpus = 6
+cpus = 3
 pids = 512
 log_bytes = 10485760
 output_bytes = 10485760
@@ -17,6 +17,14 @@ platform = "linux/amd64"
 model = "qwen/qwen3.7-flash"
 openrouter_base_url = "https://openrouter.ai/api/v1"
 
+[paths]
+solutions = ".."
+dataset = "../data"
+answers = "../answers"
+results = "../results"
+
 [execution]
-max_concurrent = 1
-max_concurrent_builds = 1
+solution_glob = "team*"
+max_concurrent = 4
+max_concurrent_builds = 2
+progress_interval_seconds = 5

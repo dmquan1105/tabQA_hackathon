@@ -1,0 +1,76 @@
+﻿ĐỀ THI
+CHỦ ĐỀ 2: Hỏi đáp trên bảng tính excel
+
+1. Mục tiêu
+Xây dựng hệ thống tự động trả lời câu hỏi bằng ngôn ngữ tự nhiên dựa trên dữ liệu trong các tệp Excel. Tệp có thể gồm nhiều trang tính, nhiều bảng trên cùng trang tính, tiêu đề phân cấp, ô gộp và cấu trúc không đồng nhất. Giải pháp cần xác định đúng thông tin liên quan và trả lời chính xác.
+2. Dữ liệu được cung cấp
+Ban tổ chức (BTC) công bố dữ liệu để các đội phát triển và tự đánh giá giải pháp, gồm:
+Thành phần
+Nội dung
+xlsx_files/
+Thư mục chứa các tệp Excel (.xlsx).
+queries.json
+Danh sách câu hỏi (id, file_name, query).
+sample_submission.csv
+Mẫu tệp kết quả với hai cột id và answer.
+
+Trong queries.json, id là mã câu hỏi, file_name là tên tệp Excel tương ứng và query là nội dung câu hỏi.
+
+Ví dụ minh họa (queries.json):
+[
+  {"id": 1, "file_name": "sample.xlsx",
+   "query": "How many people have a score higher than 80?"},
+  {"id": 2, "file_name": "sample.xlsx",
+   "query": "What is the last name of the person with the highest score?"}
+]
+
+ 
+Ví dụ kết quả tương ứng (submission.csv):
+id,answer
+1,11
+2,Ngo
+
+ 
+Bài dự thi được đánh giá trên tập kiểm thử ẩn, xây dựng theo quy trình tương tự dữ liệu công khai.
+3. Yêu cầu bài dự thi
+Giải pháp nhận thư mục các tệp .xlsx và tệp queries.json, xuất kết quả ra submission.csv theo đúng định dạng mẫu.
+Mỗi id trong queries.json phải có đúng một dòng kết quả; answer chỉ chứa đáp án cuối cùng, không kèm giải thích.
+ Mỗi đội nộp một tệp .zip gồm mã nguồn, tệp cấu hình/phụ thuộc cần thiết và README.md hướng dẫn cài đặt, cấu hình và chạy bằng dòng lệnh. 
+Giải pháp phải chạy lại được trên dữ liệu mới, không phụ thuộc đường dẫn cố định đến dữ liệu mẫu. Bài không chạy được hoặc không tạo ra tệp kết quả hợp lệ sẽ không được chấm.
+4. Tài nguyên cho phép và giới hạn thực thi
+LLM: 
+Nếu sử dụng LLM để trả lời câu hỏi, giải pháp phải hỗ trợ sử dụng mô hình thống nhất khi chấm thi: Qwen3.7 Flash (model ID: qwen/qwen3.7-flash) trên OpenRouter (https://openrouter.ai/qwen/qwen3.7-flash). Đội thi cần cho phép cấu hình thông tin truy cập API; không đưa khóa API vào mã nguồn. Quy định này không hạn chế việc sử dụng công cụ AI để phát triển giải pháp.
+Tổng chi phí gọi LLM trên toàn bộ tập kiểm thử ẩn không vượt quá 0.10 USD/câu hỏi cho mỗi lần chấm, bao gồm cả các lượt gọi lại (retry). Chi phí được tính theo mức sử dụng API do BTC ghi nhận.
+Thời gian thực thi: Tối đa 40 phút/ 20 câu hỏi, tính từ khi bắt đầu chạy giải pháp đến khi tạo xong tệp submission.csv, bao gồm cả xử lý dữ liệu và gọi API. Giải pháp sẽ được chấm trên máy của BTC (6 core vCPU, 12 GB RAM)
+Giới hạn bộ nhớ: Bài dự thi cần được nén dưới dạng tệp .zip và không được vượt quá 100MB. Trong quá trình chạy giải pháp trên tập kiểm thử ẩn, tổng không gian bộ nhớ mà giải pháp sử dụng không được vượt quá 1GB.
+Nếu một trong các giới hạn trên bị vi phạm, BTC dừng thực thi và bài dự thi không được chấm điểm.
+5. Chấm điểm và xếp hạng
+BTC chạy các bài dự thi hợp lệ trên tập kiểm thử ẩn. Việc xếp hạng lần lượt dựa trên ba tiêu chí ưu tiên:
+Số câu trả lời đúng theo so khớp chính xác với đáp án chuẩn (Exact Match): nhiều hơn xếp trước.
+Thời gian thực thi trung bình mỗi câu hỏi: thấp hơn xếp trước nếu số câu đúng bằng nhau.
+Số token LLM sử dụng trung bình mỗi câu hỏi: thấp hơn xếp trước nếu hai tiêu chí trên bằng nhau.
+6. Lịch trình
+Thời điểm
+Hoạt động
+Thứ Ba, 00:00
+BTC công bố bộ dữ liệu công khai lần 1; các đội bắt đầu phát triển giải pháp.
+Thứ Sáu, 00:00
+BTC công bố bộ dữ liệu công khai lần 2.
+Thứ Bảy, 00:00
+Hạn cuối nộp tệp .zip chứa bài dự thi.
+Thứ Bảy, 00:00–06:00
+BTC chấm các bài dự thi hợp lệ trên tập kiểm thử ẩn.
+Thứ Bảy, 07:00
+Công bố bảng xếp hạng tạm thời.
+Thứ Bảy – Chủ Nhật
+Vấn đáp xác minh giải pháp của các đội thi.
+Sau vấn đáp
+Công bố bảng xếp hạng chính thức.
+
+ 
+7. Vấn đáp và xác minh
+Vấn đáp nhằm xác minh mức độ làm chủ giải pháp của đội thi. Các đội cần giải thích được cách hoạt động, các thành phần chính và chứng minh khả năng điều chỉnh mã nguồn theo yêu cầu phù hợp với phạm vi đề thi. Đội không đáp ứng yêu cầu xác minh sẽ bị loại khỏi bảng xếp hạng chính thức.
+
+Bộ dữ liệu công khai đợt 1
+
+Bộ dữ liệu công khai đợt 1

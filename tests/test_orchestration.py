@@ -51,6 +51,7 @@ class OrchestrationTests(unittest.TestCase):
             queries.write_text('[{"id": 1}]', encoding="utf-8")
             run_dir = root / "result"
             run_dir.mkdir()
+            answers_dir = root / "answers"
             result = judge_submission(
                 Submission("team", source, False),
                 "run-1",
@@ -64,12 +65,17 @@ class OrchestrationTests(unittest.TestCase):
                 Limits(),
                 FakeRunner([["id", "answer"], ["1", "yes"]]),  # type: ignore[arg-type]
                 threading.Semaphore(1),
+                answers_dir=answers_dir,
             )
             self.assertEqual(result.status, Status.ACCEPTED)
             self.assertEqual(result.correct, 1)
             stored = json.loads((run_dir / "result.json").read_text(encoding="utf-8"))
             self.assertEqual(stored["status"], "ACCEPTED")
             self.assertTrue((run_dir / "submission.csv").is_file())
+            self.assertEqual(
+                (answers_dir / "team" / "submission.csv").read_text(encoding="utf-8"),
+                (run_dir / "submission.csv").read_text(encoding="utf-8"),
+            )
             self.assertFalse((run_dir / "container-output").exists())
 
     def test_trusted_proxy_usage_enforces_cost_limit(self) -> None:

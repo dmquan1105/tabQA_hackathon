@@ -27,7 +27,13 @@ class StagingTests(unittest.TestCase):
             source = root / "Team Alpha"
             source.mkdir()
             (source / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
-            found = discover_submissions(root)
+            (root / "data").mkdir()
+            template = root / "submission-template"
+            template.mkdir()
+            (template / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
+            (root / "README.md").write_text("judge repository", encoding="utf-8")
+            found = discover_submissions(root, "team*")
+            self.assertEqual(len(found), 1)
             self.assertEqual(found[0].submission_id, "team-alpha")
             source_hash, context_hash = stage_submission(found[0], root / "stage", Limits())
             self.assertEqual(source_hash, context_hash)

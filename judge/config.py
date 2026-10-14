@@ -37,6 +37,20 @@ def load_judge_runtime(path: Path | None) -> dict[str, Any]:
     return _read_toml(path).get("runtime", {})
 
 
+def load_paths(path: Path | None) -> dict[str, Path]:
+    raw = _read_toml(path).get("paths", {})
+    allowed = {"solutions", "dataset", "answers", "results"}
+    unknown = set(raw) - allowed
+    if unknown:
+        raise ValueError(f"unknown path settings: {', '.join(sorted(unknown))}")
+    base = path.resolve().parent if path is not None else Path.cwd()
+    paths: dict[str, Path] = {}
+    for name, value in raw.items():
+        configured = Path(str(value))
+        paths[name] = configured.resolve() if configured.is_absolute() else (base / configured).resolve()
+    return paths
+
+
 def load_runtime_file(path: Path | None) -> dict[str, Any]:
     return _read_toml(path)
 
