@@ -167,11 +167,15 @@ def judge_submission(
             )
             result.run_seconds = outcome.seconds
             result.exit_code = outcome.exit_code
-            usage = read_usage(usage_path, limits) if usage_path is not None else {
+            external_usage = read_usage(usage_path, limits) if usage_path is not None else {
                 "prompt_tokens": None,
                 "completion_tokens": None,
                 "total_tokens": None,
                 "llm_cost_usd": None,
+            }
+            usage = {
+                key: outcome.usage.get(key) if outcome.usage and outcome.usage.get(key) is not None else value
+                for key, value in external_usage.items()
             }
             apply_usage(result, usage, len(query_ids))
             if result.llm_cost_usd is not None and result.llm_cost_usd > len(query_ids) * limits.cost_usd_per_question:

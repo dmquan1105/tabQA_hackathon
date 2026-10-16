@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .models import Limits, RuntimeConfig, Status
+from .openrouter_proxy import OpenRouterProxy
 
 
 @dataclass
@@ -25,6 +26,7 @@ class RunOutcome:
     seconds: float
     exit_code: int | None = None
     error: str | None = None
+    usage: dict[str, object] | None = None
 
 
 def valid_entrypoint(value: object) -> bool:
@@ -143,77 +145,97 @@ class DockerRunner:
         stdout_path: Path,
         stderr_path: Path,
     ) -> RunOutcome:
-        command = [
-            "docker",
-            "run",
-            "--name",
-            container_name,
-            "--platform",
-            self.platform,
-            "--cpus",
-            str(self.limits.cpus),
-            "--memory",
-            str(self.limits.memory_bytes),
-            "--memory-swap",
-            str(self.limits.memory_bytes),
-            "--pids-limit",
-            str(self.limits.pids),
-            "--read-only",
-            "--cap-drop",
-            "ALL",
-            "--security-opt",
-            "no-new-privileges",
-            "--tmpfs",
-            "/tmp:rw,size=256m",
-            "--mount",
-            f"type=bind,src={xlsx_dir.resolve()},dst=/input/xlsx_files,readonly",
-            "--mount",
-            f"type=bind,src={queries_path.resolve()},dst=/input/queries.json,readonly",
-            "--mount",
-            f"type=bind,src={output_dir.resolve()},dst=/output",
-            image_tag,
-            "--xlsx-dir",
-            "/input/xlsx_files",
-            "--queries",
-            "/input/queries.json",
-            "--output",
-            "/output/submission.csv",
-            "--openrouter-key",
-            runtime.openrouter_key,
-            "--openrouter-model",
-            runtime.openrouter_model,
-            "--openrouter-base-url",
-            runtime.openrouter_base_url,
-        ]
-        with self._lock:
-            self._containers.add(container_name)
-        try:
-            try:
-                exit_code, seconds, timed_out = self._run_logged(
-                    command,
-                    stdout_path,
-                    stderr_path,
-                    self.limits.run_seconds,
-                    runtime.openrouter_key,
-                )
-            except (OSError, subprocess.SubprocessError) as exc:
-                return RunOutcome(Status.JUDGE_ERROR, 0.0, error=str(exc).replace(runtime.openrouter_key, "[REDACTED]"))
-            if timed_out:
-                subprocess.run(["docker", "rm", "--force", container_name], capture_output=True)
-                return RunOutcome(Status.TIME_LIMIT, seconds, error="execution time limit exceeded")
-            try:
-                state = self._docker_json(["docker", "container", "inspect", container_name])[0]["State"]
-            except (OSError, subprocess.SubprocessError, RuntimeError, KeyError, IndexError) as exc:
-                return RunOutcome(Status.JUDGE_ERROR, seconds, exit_code, str(exc))
-            if state.get("OOMKilled"):
-                return RunOutcome(Status.MEMORY_LIMIT, seconds, exit_code, "container was OOM-killed")
-            if exit_code != 0:
-                return RunOutcome(Status.RUNTIME_ERROR, seconds, exit_code, f"container exited {exit_code}")
-            return RunOutcome(None, seconds, exit_code)
-        finally:
-            subprocess.run(["docker", "rm", "--force", container_name], capture_output=True)
+        with OpenRouterProxy(runtime.openrouter_base_url, runtime.openrouter_key) as proxy:
+            command = [
+                "docker",
+                "run",
+                "--name",
+                container_name,
+                "--platform",
+                self.platform,
+                "--add-host",
+                "host.docker.internal:host-gateway",
+                "--cpus",
+                str(self.limits.cpus),
+                "--memory",
+                str(self.limits.memory_bytes),
+                "--memory-swap",
+                str(self.limits.memory_bytes),
+                "--pids-limit",
+                str(self.limits.pids),
+                "--read-only",
+                "--cap-drop",
+                "ALL",
+                "--security-opt",
+                "no-new-privileges",
+                "--tmpfs",
+                "/tmp:rw,size=256m",
+                "--mount",
+                f"type=bind,src={xlsx_dir.resolve()},dst=/input/xlsx_files,readonly",
+                "--mount",
+                f"type=bind,src={queries_path.resolve()},dst=/input/queries.json,readonly",
+                "--mount",
+                f"type=bind,src={output_dir.resolve()},dst=/output",
+                image_tag,
+                "--xlsx-dir",
+                "/input/xlsx_files",
+                "--queries",
+                "/input/queries.json",
+                "--output",
+                "/output/submission.csv",
+                "--openrouter-key",
+                proxy.access_token,
+                "--openrouter-model",
+                runtime.openrouter_model,
+                "--openrouter-base-url",
+                proxy.base_url,
+            ]
             with self._lock:
-                self._containers.discard(container_name)
+                self._containers.add(container_name)
+            try:
+                try:
+                    exit_code, seconds, timed_out = self._run_logged(
+                        command,
+                        stdout_path,
+                        stderr_path,
+                        self.limits.run_seconds,
+                        proxy.access_token,
+                    )
+                except (OSError, subprocess.SubprocessError) as exc:
+                    return RunOutcome(Status.JUDGE_ERROR, 0.0, error=str(exc), usage=proxy.usage.snapshot())
+                if timed_out:
+                    subprocess.run(["docker", "rm", "--force", container_name], capture_output=True)
+                    return RunOutcome(
+                        Status.TIME_LIMIT,
+                        seconds,
+                        error="execution time limit exceeded",
+                        usage=proxy.usage.snapshot(),
+                    )
+                try:
+                    state = self._docker_json(["docker", "container", "inspect", container_name])[0]["State"]
+                except (OSError, subprocess.SubprocessError, RuntimeError, KeyError, IndexError) as exc:
+                    return RunOutcome(Status.JUDGE_ERROR, seconds, exit_code, str(exc), proxy.usage.snapshot())
+                if state.get("OOMKilled"):
+                    return RunOutcome(
+                        Status.MEMORY_LIMIT,
+                        seconds,
+                        exit_code,
+                        "container was OOM-killed",
+                        proxy.usage.snapshot(),
+                    )
+                if exit_code != 0:
+                    return RunOutcome(
+                        Status.RUNTIME_ERROR,
+                        seconds,
+                        exit_code,
+                        f"container exited {exit_code}",
+                        proxy.usage.snapshot(),
+                    )
+                return RunOutcome(None, seconds, exit_code, usage=proxy.usage.snapshot())
+            finally:
+                subprocess.run(["docker", "rm", "--force", container_name], capture_output=True)
+                with self._lock:
+                    self._containers.discard(container_name)
 
     def cleanup(self) -> None:
         with self._lock:

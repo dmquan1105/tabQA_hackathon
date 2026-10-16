@@ -15,8 +15,9 @@ from judge.reporting import write_leaderboard
 
 
 class FakeRunner:
-    def __init__(self, rows: list[list[str]]) -> None:
+    def __init__(self, rows: list[list[str]], usage: dict[str, object] | None = None) -> None:
         self.rows = rows
+        self.usage = usage
 
     def build(self, context: Path, image_tag: str, stdout_path: Path, stderr_path: Path) -> BuildOutcome:
         return BuildOutcome(None, 1.25, "sha256:image", 1234)
@@ -34,7 +35,7 @@ class FakeRunner:
     ) -> RunOutcome:
         with (output_dir / "submission.csv").open("w", encoding="utf-8", newline="") as handle:
             csv.writer(handle).writerows(self.rows)
-        return RunOutcome(None, 2.0, 0)
+        return RunOutcome(None, 2.0, 0, usage=self.usage)
 
 
 class OrchestrationTests(unittest.TestCase):
@@ -110,6 +111,45 @@ class OrchestrationTests(unittest.TestCase):
             )
             self.assertEqual(result.status, Status.COST_LIMIT)
             self.assertEqual(result.total_tokens, 20)
+
+    def test_runner_usage_populates_result(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "team"
+            source.mkdir()
+            (source / "Dockerfile").write_text("FROM scratch", encoding="utf-8")
+            xlsx = root / "xlsx_files"
+            xlsx.mkdir()
+            queries = root / "queries.json"
+            queries.write_text('[{"id": 1}]', encoding="utf-8")
+            run_dir = root / "result"
+            run_dir.mkdir()
+            runner = FakeRunner(
+                [["id", "answer"], ["1", "yes"]],
+                {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "total_tokens": 15,
+                    "llm_cost_usd": 0.01,
+                },
+            )
+            result = judge_submission(
+                Submission("team", source, False),
+                "run-1",
+                run_dir,
+                datetime.now(timezone.utc),
+                xlsx,
+                queries,
+                ["1"],
+                {"1": "yes"},
+                RuntimeConfig("secret", "model", "url"),
+                Limits(),
+                runner,  # type: ignore[arg-type]
+                threading.Semaphore(1),
+            )
+            self.assertEqual(result.total_tokens, 15)
+            self.assertEqual(result.average_tokens_per_question, 15.0)
+            self.assertEqual(result.llm_cost_usd, 0.01)
 
     def test_leaderboard_uses_official_tie_breaks(self) -> None:
         from judge.models import RunResult

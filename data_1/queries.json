@@ -1,0 +1,102 @@
+[
+  {
+    "id": "p1_q001",
+    "file_name": "p1_t01.xlsx",
+    "query": "How many more hours per day do married mothers spend on household activities compared to fathers when both spouses work full time with the youngest child is between 6 and 17 years old? Round the answer to two decimal places."
+  },
+  {
+    "id": "p1_q002",
+    "file_name": "p1_t02.xlsx",
+    "query": "Is the agricultural export value for the fiscal year-to-date 2024 greater than that for the fiscal year-to-date 2023?"
+  },
+  {
+    "id": "p1_q003",
+    "file_name": "p1_t03.xlsx",
+    "query": "Considering all categories, infer which category experienced a highest change (absolute value) in the “Unadjusted percent change” between September 2024 and October 2024."
+  },
+  {
+    "id": "p1_q004",
+    "file_name": "p1_t04.xlsx",
+    "query": "What is the difference between civilian noninstitutional population and civilian labor force for women with 'Some college, no degree'?"
+  },
+  {
+    "id": "p1_q005",
+    "file_name": "p1_t05.xlsx",
+    "query": "How does the number of full-time workers compare to part-time workers for the 'Total, 16 years and over' category?"
+  },
+  {
+    "id": "p1_q006",
+    "file_name": "p1_t06.xlsx",
+    "query": "What is the total number of employed persons aged 20 to 24 years in the Construction and Manufacturing industries combined?"
+  },
+  {
+    "id": "p1_q007",
+    "file_name": "p1_t06.xlsx",
+    "query": "Identify the industry with the highest number of employed persons aged 16 to 19 years."
+  },
+  {
+    "id": "p1_q008",
+    "file_name": "p1_t06.xlsx",
+    "query": "For persons aged 20 years and over, does employment in Financial Activities exceed that in Transportation and Utilities? Provide 'Yes' or 'No'."
+  },
+  {
+    "id": "p1_q009",
+    "file_name": "p1_t07.xlsx",
+    "query": "Calculate the total number of unpaid family workers across all age groups in the agricultural sector. What is the final sum?"
+  },
+  {
+    "id": "p1_q010",
+    "file_name": "p1_t08.xlsx",
+    "query": "Rank the following sectors by the number of employees in 'Transportation and Material Moving': Agriculture, Manufacturing, and Construction."
+  },
+  {
+    "id": "p1_q011",
+    "file_name": "p1_t08.xlsx",
+    "query": "Calculate the combined total of employees in 'Protective service occupations' and 'Service occupations, except protective' for the Manufacturing sector."
+  },
+  {
+    "id": "p1_q012",
+    "file_name": "p1_t09.xlsx",
+    "query": "What is the number of persons at work in all industries who work 5-14 hours and in agriculture?"
+  },
+  {
+    "id": "p1_q013",
+    "file_name": "p1_t10.xlsx",
+    "query": "What is the difference in the total number of people working in Manufacturing and Construction industries in 2023?"
+  },
+  {
+    "id": "p1_q014",
+    "file_name": "p1_t11.xlsx",
+    "query": "Based on the dataset, what are number of people who worked 1 to 34 hours and worked 35 hours or more."
+  },
+  {
+    "id": "p1_q015",
+    "file_name": "p1_t11.xlsx",
+    "query": "What are the “Average hours” of worked by persons who are widowed, divorced, or separated among men and women aged 16 years and over?"
+  },
+  {
+    "id": "p1_q016",
+    "file_name": "p1_t11.xlsx",
+    "query": "What is the number of worker in “Total, 16 years and over” "
+  },
+  {
+    "id": "p1_q017",
+    "file_name": "p1_t12.xlsx",
+    "query": "What is the total number of fatal occupational injuries recorded in Alabama and Florida combined for the years 1998 and 2001?"
+  },
+  {
+    "id": "p1_q018",
+    "file_name": "p1_t13.xlsx",
+    "query": "What is the total number of fatal occupational injuries for Vermont across the years 2003 to 2018?"
+  },
+  {
+    "id": "p1_q019",
+    "file_name": "p1_t14.xlsx",
+    "query": "What is the total hours worked for self-employed individuals?"
+  },
+  {
+    "id": "p1_q020",
+    "file_name": "p1_t15.xlsx",
+    "query": "What was the combined percentage change in Output per worker and Output per hour worked for the whole economy in 2021 Q1 compared to the same quarter a year ago? The answer should be rounded to two decimal place."
+  }
+]

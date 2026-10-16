@@ -1,0 +1,107 @@
+{
+  "submission_id": "team002",
+  "run_id": "20261014T070835Z-265bc7a7",
+  "status": "ACCEPTED",
+  "submission_sha256": "198be19a6e77eab2833976f0396428304b3fa93407bd0493938ca8ea7021c0d3",
+  "context_sha256": "198be19a6e77eab2833976f0396428304b3fa93407bd0493938ca8ea7021c0d3",
+  "correct": 18,
+  "total": 20,
+  "build_seconds": 28.09399999998277,
+  "run_seconds": 113.17200000002049,
+  "average_seconds_per_question": 5.658600000001025,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "average_tokens_per_question": null,
+  "llm_cost_usd": null,
+  "exit_code": 0,
+  "image_id": "sha256:d100f3e9e394b51683f955b275ae2fb9054e988a9b50a4f83c4bf251bdd0f892",
+  "image_size": 93136961,
+  "queued_at": "2026-10-14T07:08:35.950436Z",
+  "started_at": "2026-10-14T07:08:35.951954Z",
+  "finished_at": "2026-10-14T07:10:57.544616Z",
+  "queue_seconds": 0.001518,
+  "error": null,
+  "per_question": [
+    {
+      "id": "p1_q001",
+      "correct": true
+    },
+    {
+      "id": "p1_q002",
+      "correct": true
+    },
+    {
+      "id": "p1_q003",
+      "correct": true
+    },
+    {
+      "id": "p1_q004",
+      "correct": true
+    },
+    {
+      "id": "p1_q005",
+      "correct": true
+    },
+    {
+      "id": "p1_q006",
+      "correct": true
+    },
+    {
+      "id": "p1_q007",
+      "correct": true
+    },
+    {
+      "id": "p1_q008",
+      "correct": true
+    },
+    {
+      "id": "p1_q009",
+      "correct": true
+    },
+    {
+      "id": "p1_q010",
+      "correct": true
+    },
+    {
+      "id": "p1_q011",
+      "correct": true
+    },
+    {
+      "id": "p1_q012",
+      "correct": true
+    },
+    {
+      "id": "p1_q013",
+      "correct": true
+    },
+    {
+      "id": "p1_q014",
+      "correct": true
+    },
+    {
+      "id": "p1_q015",
+      "correct": false
+    },
+    {
+      "id": "p1_q016",
+      "correct": true
+    },
+    {
+      "id": "p1_q017",
+      "correct": true
+    },
+    {
+      "id": "p1_q018",
+      "correct": true
+    },
+    {
+      "id": "p1_q019",
+      "correct": true
+    },
+    {
+      "id": "p1_q020",
+      "correct": false
+    }
+  ]
+}

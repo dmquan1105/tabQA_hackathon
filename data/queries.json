@@ -1,102 +1,182 @@
 [
   {
-    "id": "p1_q001",
-    "file_name": "p1_t01.xlsx",
-    "query": "How many more hours per day do married mothers spend on household activities compared to fathers when both spouses work full time with the youngest child is between 6 and 17 years old? Round the answer to two decimal places."
+    "id": "p2_q001",
+    "table": "p2_t01.xlsx",
+    "question": "Compare the average time spent on 'Housework' by not-employed fathers and full-time employed mothers with Own household children 6-17. Who spends more, and by how many hours? Round the answer to two decimal places.",
+    "answer_format": ""
   },
   {
-    "id": "p1_q002",
-    "file_name": "p1_t02.xlsx",
-    "query": "Is the agricultural export value for the fiscal year-to-date 2024 greater than that for the fiscal year-to-date 2023?"
+    "id": "p2_q002",
+    "table": "p2_t01.xlsx",
+    "question": "For 'Lawn and garden care', which group of married fathers in among all categories with Own household children under 18 has the highest percentage of participation?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q003",
-    "file_name": "p1_t03.xlsx",
-    "query": "Considering all categories, infer which category experienced a highest change (absolute value) in the “Unadjusted percent change” between September 2024 and October 2024."
+    "id": "p2_q003",
+    "table": "p2_t02.xlsx",
+    "question": "Infer the activity category where fathers spend more 0.4 hours than mothers with “Own household children under 18” when mother employed part time and father employed full time.",
+    "answer_format": ""
   },
   {
-    "id": "p1_q004",
-    "file_name": "p1_t04.xlsx",
-    "query": "What is the difference between civilian noninstitutional population and civilian labor force for women with 'Some college, no degree'?"
+    "id": "p2_q004",
+    "table": "p2_t03.xlsx",
+    "question": "Rank the categorie under “Housing” by their unadjusted percent change to Jan. 2024 from Jan. 2023, listing them in descending order.",
+    "answer_format": ""
   },
   {
-    "id": "p1_q005",
-    "file_name": "p1_t05.xlsx",
-    "query": "How does the number of full-time workers compare to part-time workers for the 'Total, 16 years and over' category?"
+    "id": "p2_q005",
+    "table": "p2_t04.xlsx",
+    "question": "What was the average CPI for \"Northeast - Size Class B/C\" from June 2023 to August 2023?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q006",
-    "file_name": "p1_t06.xlsx",
-    "query": "What is the total number of employed persons aged 20 to 24 years in the Construction and Manufacturing industries combined?"
+    "id": "p2_q006",
+    "table": "p2_t05.xlsx",
+    "question": "Match the year where the employment in agriculture was the highest and state its corresponding total employed population in the year.",
+    "answer_format": ""
   },
   {
-    "id": "p1_q007",
-    "file_name": "p1_t06.xlsx",
-    "query": "Identify the industry with the highest number of employed persons aged 16 to 19 years."
+    "id": "p2_q007",
+    "table": "p2_t05.xlsx",
+    "question": "In which year did the number of unemployed individuals drop below 2,000 while the total employed percentage of the population was above 57%?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q008",
-    "file_name": "p1_t06.xlsx",
-    "query": "For persons aged 20 years and over, does employment in Financial Activities exceed that in Transportation and Utilities? Provide 'Yes' or 'No'."
+    "id": "p2_q008",
+    "table": "p2_t05.xlsx",
+    "question": "What was the employment in non-agricultural industries in the year with the highest civilian labor force total?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q009",
-    "file_name": "p1_t07.xlsx",
-    "query": "Calculate the total number of unpaid family workers across all age groups in the agricultural sector. What is the final sum?"
+    "id": "p2_q009",
+    "table": "p2_t06.xlsx",
+    "question": "What is the difference between the total civilian labor force of men for “16 years and over” in 2023 and 2022?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q010",
-    "file_name": "p1_t08.xlsx",
-    "query": "Rank the following sectors by the number of employees in 'Transportation and Material Moving': Agriculture, Manufacturing, and Construction."
+    "id": "p2_q010",
+    "table": "p2_t06.xlsx",
+    "question": "What is the total number of participation rates for total Civilian labor force in 2022 and 2023.",
+    "answer_format": ""
   },
   {
-    "id": "p1_q011",
-    "file_name": "p1_t08.xlsx",
-    "query": "Calculate the combined total of employees in 'Protective service occupations' and 'Service occupations, except protective' for the Manufacturing sector."
+    "id": "p2_q011",
+    "table": "p2_t07.xlsx",
+    "question": "Rank the following occupations based on their total employment in 2023: 'Management occupations,' 'Business and financial operations occupations,' and 'Management, professional, and related occupations.'",
+    "answer_format": ""
   },
   {
-    "id": "p1_q012",
-    "file_name": "p1_t09.xlsx",
-    "query": "What is the number of persons at work in all industries who work 5-14 hours and in agriculture?"
+    "id": "p2_q012",
+    "table": "p2_t07.xlsx",
+    "question": "How many more women than men for “16 years and over” were employed in 'Management, professional, and related occupations' in 2022?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q013",
-    "file_name": "p1_t10.xlsx",
-    "query": "What is the difference in the total number of people working in Manufacturing and Construction industries in 2023?"
+    "id": "p2_q013",
+    "table": "p2_t08.xlsx",
+    "question": "What is the total number of employed persons in the 'Management, professional, and related occupations' category, and how does it compare to the 'Total, 16 years and over'?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q014",
-    "file_name": "p1_t11.xlsx",
-    "query": "Based on the dataset, what are number of people who worked 1 to 34 hours and worked 35 hours or more."
+    "id": "p2_q014",
+    "table": "p2_t08.xlsx",
+    "question": "Rank the following occupations by their percentage of women employed: 'Chief executives,' 'Marketing managers,' and 'General and operations managers.'",
+    "answer_format": ""
   },
   {
-    "id": "p1_q015",
-    "file_name": "p1_t11.xlsx",
-    "query": "What are the “Average hours” of worked by persons who are widowed, divorced, or separated among men and women aged 16 years and over?"
+    "id": "p2_q015",
+    "table": "p2_t09.xlsx",
+    "question": "What is the median age of workers in 'Management, professional, and related occupations' and the total number of workers aged 35 to 44 years?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q016",
-    "file_name": "p1_t11.xlsx",
-    "query": "What is the number of worker in “Total, 16 years and over” "
+    "id": "p2_q016",
+    "table": "p2_t10.xlsx",
+    "question": "What is the total employment of Asian women in 2023 across all occupations?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q017",
-    "file_name": "p1_t12.xlsx",
-    "query": "What is the total number of fatal occupational injuries recorded in Alabama and Florida combined for the years 1998 and 2001?"
+    "id": "p2_q017",
+    "table": "p2_t10.xlsx",
+    "question": "Compare the employment numbers of Black men and White men in 2022 within management occupations. Which group has higher employment?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q018",
-    "file_name": "p1_t13.xlsx",
-    "query": "What is the total number of fatal occupational injuries for Vermont across the years 2003 to 2018?"
+    "id": "p2_q018",
+    "table": "p2_t11.xlsx",
+    "question": "Rank the ethnic groups by their total employment in 2023 from highest to lowest.",
+    "answer_format": ""
   },
   {
-    "id": "p1_q019",
-    "file_name": "p1_t14.xlsx",
-    "query": "What is the total hours worked for self-employed individuals?"
+    "id": "p2_q019",
+    "table": "p2_t12.xlsx",
+    "question": "What is the total number of employed persons in the mining, quarrying, and oil and gas extraction industries, combining both wage and salary workers and self-employed workers?",
+    "answer_format": ""
   },
   {
-    "id": "p1_q020",
-    "file_name": "p1_t15.xlsx",
-    "query": "What was the combined percentage change in Output per worker and Output per hour worked for the whole economy in 2021 Q1 compared to the same quarter a year ago? The answer should be rounded to two decimal place."
+    "id": "p2_q020",
+    "table": "p2_t12.xlsx",
+    "question": "Identify the industry with the highest number of government-employed workers.",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q021",
+    "table": "p2_t12.xlsx",
+    "question": "Calculate the percentage of unpaid family workers relative to the total number of employed persons in the construction industry. Round the answer to two decimal places.",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q022",
+    "table": "p2_t13.xlsx",
+    "question": "By how much did the exposure to flooding in Queensland change from 2017 to 2020?",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q023",
+    "table": "p2_t14.xlsx",
+    "question": "Which industry under 'Construction' has the highest relative standard error for the number of cases? Provide the relative standard error as well.",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q024",
+    "table": "p2_t15.xlsx",
+    "question": "Does the median incidence rate for Logging in establishments with 50-249 employees exceed 1? The answer is of type Yes/No.",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q025",
+    "table": "p2_t16.xlsx",
+    "question": "Which employment size category in the Agriculture, Forestry, Fishing, and Hunting sector has the lowest average incidence rate?",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q026",
+    "table": "p2_t17.xlsx",
+    "question": "If the incidence rate of total recordable cases in 'Administrative and support and waste management and remediation services' were to decrease by 10%, what would be the new incidence rate? The answer is rounded to two decimal places.",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q027",
+    "table": "p2_t18.xlsx",
+    "question": "What is the total incidence rate of cases with days away from work and job restriction or transfer in the Metal valve manufacturing industry? The answer is rounded to two decimal place.",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q028",
+    "table": "p2_t19.xlsx",
+    "question": "In which year did the 'Rubber, plastics & non-metallic minerals' sector have the highest output per job?",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q029",
+    "table": "p2_t20.xlsx",
+    "question": "How many cities report an average hourly wage for time-based pay in Sales and Related Occupations that is less than $22?",
+    "answer_format": ""
+  },
+  {
+    "id": "p2_q030",
+    "table": "p2_t21.xlsx",
+    "question": "Which occupational group had the highest change in the Employment Cost Index for total compensation from September 2023 to September 2024?",
+    "answer_format": ""
   }
 ]
